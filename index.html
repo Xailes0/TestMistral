@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suivi des Repas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .total-row {
+            font-weight: bold;
+            background-color: #e7e7e7 !important;
+        }
+        .form-container {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .form-container input,
+        .form-container select {
+            padding: 8px;
+            margin: 5px 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .form-container button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .form-container button:hover {
+            background-color: #45a049;
+        }
+        .download-btn {
+            background-color: #2196F3;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .download-btn:hover {
+            background-color: #0b7dda;
+        }
+    </style>
+</head>
+<body>
+    <h1>🍽️ Suivi des Repas</h1>
+    
+    <div class="form-container">
+        <h2>Ajouter un repas</h2>
+        <form id="mealForm">
+            <label for="date">Date:</label>
+            <input type="date" id="date" required>
+
+            <label for="mealType">Type de repas:</label>
+            <select id="mealType" required>
+                <option value="Midi">Midi</option>
+                <option value="16h">16h</option>
+                <option value="20h">20h</option>
+            </select>
+
+            <label for="food">Aliments:</label>
+            <input type="text" id="food" placeholder="Ex: Poulet + quinoa + brocolis" required>
+
+            <label for="calories">Calories (kcal):</label>
+            <input type="number" id="calories" required>
+
+            <label for="proteins">Protéines (g):</label>
+            <input type="number" id="proteins" required>
+
+            <label for="carbs">Glucides (g):</label>
+            <input type="number" id="carbs" required>
+
+            <label for="fats">Lipides (g):</label>
+            <input type="number" id="fats" required>
+
+            <label for="notes">Notes:</label>
+            <input type="text" id="notes" placeholder="Ex: Collation légère">
+
+            <button type="submit">Ajouter</button>
+        </form>
+        <button id="downloadBtn" class="download-btn">Télécharger le CSV</button>
+    </div>
+
+    <h2>Liste des repas</h2>
+    <table id="mealTable">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Type de Repas</th>
+                <th>Aliments</th>
+                <th>Calories (kcal)</th>
+                <th>Protéines (g)</th>
+                <th>Glucides (g)</th>
+                <th>Lipides (g)</th>
+                <th>Notes</th>
+            </tr>
+        </thead>
+        <tbody id="mealTableBody">
+            <!-- Les repas seront ajoutés ici dynamiquement -->
+        </tbody>
+        <tfoot>
+            <tr class="total-row">
+                <td colspan="3">Total journalier</td>
+                <td id="totalCalories">0</td>
+                <td id="totalProteins">0</td>
+                <td id="totalCarbs">0</td>
+                <td id="totalFats">0</td>
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <script>
+        // Variable globale pour stocker les repas
+        let meals = [];
+
+        // Charger les données depuis le fichier CSV
+        async function loadMeals() {
+            try {
+                const response = await fetch('repas_tracking.csv');
+                if (!response.ok) {
+                    throw new Error('Fichier CSV introuvable');
+                }
+                const csvData = await response.text();
+                parseCSV(csvData);
+            } catch (error) {
+                console.error("Erreur lors du chargement du CSV:", error);
+            }
+        }
+
+        // Analyser le CSV et afficher les données
+        function parseCSV(csvData) {
+            const rows = csvData.split('\n').filter(row => row.trim() !== '');
+            const tableBody = document.getElementById('mealTableBody');
+            tableBody.innerHTML = '';
+            meals = []; // Réinitialiser les repas
+
+            let totalCalories = 0;
+            let totalProteins = 0;
+            let totalCarbs = 0;
+            let totalFats = 0;
+
+            for (let i = 1; i < rows.length; i++) {
+                const columns = rows[i].split(',').map(col => col.trim());
+                if (columns.length >= 8) {
+                    const [date, mealType, food, calories, proteins, carbs, fats, notes] = columns;
+                    
+                    const meal = {
+                        date,
+                        mealType,
+                        food,
+                        calories: parseInt(calories) || 0,
+                        proteins: parseInt(proteins) || 0,
+                        carbs: parseInt(carbs) || 0,
+                        fats: parseInt(fats) || 0,
+                        notes
+                    };
+                    meals.push(meal);
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${date}</td>
+                        <td>${mealType}</td>
+                        <td>${food}</td>
+                        <td>${calories}</td>
+                        <td>${proteins}</td>
+                        <td>${carbs}</td>
+                        <td>${fats}</td>
+                        <td>${notes}</td>
+                    `;
+                    tableBody.appendChild(row);
+
+                    // Mettre à jour les totaux
+                    totalCalories += meal.calories;
+                    totalProteins += meal.proteins;
+                    totalCarbs += meal.carbs;
+                    totalFats += meal.fats;
+                }
+            }
+
+            // Afficher les totaux
+            document.getElementById('totalCalories').textContent = totalCalories;
+            document.getElementById('totalProteins').textContent = totalProteins;
+            document.getElementById('totalCarbs').textContent = totalCarbs;
+            document.getElementById('totalFats').textContent = totalFats;
+        }
+
+        // Ajouter un repas au tableau et à la liste globale
+        document.getElementById('mealForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const date = document.getElementById('date').value;
+            const mealType = document.getElementById('mealType').value;
+            const food = document.getElementById('food').value;
+            const calories = parseInt(document.getElementById('calories').value) || 0;
+            const proteins = parseInt(document.getElementById('proteins').value) || 0;
+            const carbs = parseInt(document.getElementById('carbs').value) || 0;
+            const fats = parseInt(document.getElementById('fats').value) || 0;
+            const notes = document.getElementById('notes').value;
+
+            const meal = {
+                date,
+                mealType,
+                food,
+                calories,
+                proteins,
+                carbs,
+                fats,
+                notes
+            };
+            meals.push(meal);
+
+            // Ajouter au tableau
+            const tableBody = document.getElementById('mealTableBody');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${date}</td>
+                <td>${mealType}</td>
+                <td>${food}</td>
+                <td>${calories}</td>
+                <td>${proteins}</td>
+                <td>${carbs}</td>
+                <td>${fats}</td>
+                <td>${notes}</td>
+            `;
+            tableBody.appendChild(row);
+
+            // Mettre à jour les totaux
+            const totalCalories = meals.reduce((sum, meal) => sum + meal.calories, 0);
+            const totalProteins = meals.reduce((sum, meal) => sum + meal.proteins, 0);
+            const totalCarbs = meals.reduce((sum, meal) => sum + meal.carbs, 0);
+            const totalFats = meals.reduce((sum, meal) => sum + meal.fats, 0);
+
+            document.getElementById('totalCalories').textContent = totalCalories;
+            document.getElementById('totalProteins').textContent = totalProteins;
+            document.getElementById('totalCarbs').textContent = totalCarbs;
+            document.getElementById('totalFats').textContent = totalFats;
+
+            // Réinitialiser le formulaire
+            document.getElementById('mealForm').reset();
+        });
+
+        // Télécharger le CSV
+        document.getElementById('downloadBtn').addEventListener('click', function() {
+            let csvContent = "Date,Type de Repas,Aliments,Calories (kcal),Protéines (g),Glucides (g),Lipides (g),Notes\n";
+            meals.forEach(meal => {
+                csvContent += `${meal.date},${meal.mealType},${meal.food},${meal.calories},${meal.proteins},${meal.carbs},${meal.fats},${meal.notes}\n`;
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'repas_tracking.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+
+        // Charger les données au démarrage
+        loadMeals();
+    </script>
+</body>
+</html>
