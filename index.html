@@ -53,6 +53,7 @@
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             overflow: hidden;
+            margin-bottom: 30px;
         }
         
         table {
@@ -102,21 +103,6 @@
             border-radius: 8px 8px 0 0;
         }
         
-        .loading {
-            text-align: center;
-            padding: 20px;
-            font-style: italic;
-            color: #666;
-        }
-        
-        .error {
-            text-align: center;
-            padding: 20px;
-            color: #d32f2f;
-            background-color: #ffebee;
-            border-radius: 8px;
-        }
-        
         @media (max-width: 768px) {
             th, td {
                 padding: 8px 10px;
@@ -138,140 +124,123 @@
     </header>
     
     <div class="container">
-        <div class="table-container">
-            <div id="loading" class="loading">Chargement des données...</div>
-            <div id="error" class="error" style="display: none;"></div>
-            <div id="mealData"></div>
+        <!-- Repas du 18/06/2026 -->
+        <div class="date-group">
+            <h2>📅 18/06/2026</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Aliments</th>
+                            <th>Calories</th>
+                            <th>Protéines</th>
+                            <th>Glucides</th>
+                            <th>Lipides</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Midi</td>
+                            <td>Poulet grillé + quinoa + brocolis</td>
+                            <td>650</td>
+                            <td>50</td>
+                            <td>40</td>
+                            <td>25</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>16h</td>
+                            <td>Yaourt grec + fruits rouges</td>
+                            <td>300</td>
+                            <td>20</td>
+                            <td>15</td>
+                            <td>18</td>
+                            <td>Collation légère</td>
+                        </tr>
+                        <tr>
+                            <td>20h</td>
+                            <td>Saumon + épinards + patate douce</td>
+                            <td>750</td>
+                            <td>45</td>
+                            <td>60</td>
+                            <td>30</td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr class="total-row">
+                            <td colspan="2">Total pour le 18/06/2026</td>
+                            <td>1700</td>
+                            <td>115</td>
+                            <td>115</td>
+                            <td>73</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+        <!-- Repas du 17/06/2026 -->
+        <div class="date-group">
+            <h2>📅 17/06/2026</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Aliments</th>
+                            <th>Calories</th>
+                            <th>Protéines</th>
+                            <th>Glucides</th>
+                            <th>Lipides</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Midi</td>
+                            <td>Crevettes + épinards + riz basmati</td>
+                            <td>550</td>
+                            <td>40</td>
+                            <td>50</td>
+                            <td>15</td>
+                            <td>Riche en protéines</td>
+                        </tr>
+                        <tr>
+                            <td>16h</td>
+                            <td>Pomme + beurre de cacahuète</td>
+                            <td>250</td>
+                            <td>8</td>
+                            <td>25</td>
+                            <td>12</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>20h</td>
+                            <td>Blanc de poulet + lentilles + carottes</td>
+                            <td>700</td>
+                            <td>60</td>
+                            <td>55</td>
+                            <td>20</td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr class="total-row">
+                            <td colspan="2">Total pour le 17/06/2026</td>
+                            <td>1500</td>
+                            <td>108</td>
+                            <td>130</td>
+                            <td>47</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
         </div>
     </div>
-
-    <script>
-        // Charger et afficher les données
-        async function loadAndDisplayMeals() {
-            const loadingDiv = document.getElementById('loading');
-            const errorDiv = document.getElementById('error');
-            const mealDataDiv = document.getElementById('mealData');
-            
-            try {
-                loadingDiv.style.display = 'block';
-                errorDiv.style.display = 'none';
-                mealDataDiv.innerHTML = '';
-                
-                const response = await fetch('repas_tracking.csv');
-                if (!response.ok) {
-                    throw new Error('Fichier CSV introuvable. Vérifie que repas_tracking.csv existe dans le même dossier.');
-                }
-                
-                const csvData = await response.text();
-                displayMeals(csvData);
-                
-            } catch (error) {
-                loadingDiv.style.display = 'none';
-                errorDiv.style.display = 'block';
-                errorDiv.textContent = `Erreur : ${error.message}`;
-                console.error("Erreur:", error);
-            }
-        }
-        
-        // Afficher les repas groupés par date
-        function displayMeals(csvData) {
-            const loadingDiv = document.getElementById('loading');
-            const mealDataDiv = document.getElementById('mealData');
-            
-            const rows = csvData.split('\n').filter(row => row.trim() !== '');
-            if (rows.length <= 1) {
-                loadingDiv.style.display = 'none';
-                mealDataDiv.innerHTML = '<div class="error">Aucun repas trouvé dans le fichier CSV.</div>';
-                return;
-            }
-            
-            // Organiser les repas par date
-            const mealsByDate = {};
-            for (let i = 1; i < rows.length; i++) {
-                const columns = rows[i].split(',').map(col => col.trim());
-                if (columns.length >= 8) {
-                    const [date, mealType, food, calories, proteins, carbs, fats, notes] = columns;
-                    if (!mealsByDate[date]) {
-                        mealsByDate[date] = [];
-                    }
-                    mealsByDate[date].push({ mealType, food, calories, proteins, carbs, fats, notes });
-                }
-            }
-            
-            // Générer le HTML
-            let html = '';
-            for (const [date, meals] of Object.entries(mealsByDate)) {
-                html += `
-                    <div class="date-group">
-                        <h2>📅 ${formatDate(date)}</h2>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Type</th>
-                                    <th>Aliments</th>
-                                    <th>Calories</th>
-                                    <th>Protéines</th>
-                                    <th>Glucides</th>
-                                    <th>Lipides</th>
-                                    <th>Notes</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                `;
-                
-                let totalCalories = 0;
-                let totalProteins = 0;
-                let totalCarbs = 0;
-                let totalFats = 0;
-                
-                meals.forEach(meal => {
-                    totalCalories += parseInt(meal.calories) || 0;
-                    totalProteins += parseInt(meal.proteins) || 0;
-                    totalCarbs += parseInt(meal.carbs) || 0;
-                    totalFats += parseInt(meal.fats) || 0;
-                    
-                    html += `
-                        <tr>
-                            <td>${meal.mealType}</td>
-                            <td>${meal.food}</td>
-                            <td>${meal.calories}</td>
-                            <td>${meal.proteins}</td>
-                            <td>${meal.carbs}</td>
-                            <td>${meal.fats}</td>
-                            <td>${meal.notes}</td>
-                        </tr>
-                    `;
-                });
-                
-                html += `
-                            </tbody>
-                            <tfoot>
-                                <tr class="total-row">
-                                    <td colspan="2">Total pour le ${formatDate(date)}</td>
-                                    <td>${totalCalories}</td>
-                                    <td>${totalProteins}</td>
-                                    <td>${totalCarbs}</td>
-                                    <td>${totalFats}</td>
-                                    <td></td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                `;
-            }
-            
-            mealDataDiv.innerHTML = html;
-            loadingDiv.style.display = 'none';
-        }
-        
-        // Formater la date (YYYY-MM-DD -> JJ/MM/YYYY)
-        function formatDate(dateStr) {
-            const [year, month, day] = dateStr.split('-');
-            return `${day}/${month}/${year}`;
-        }
-        
-        // Charger les données au démarrage
-        loadAndDisplayMeals();
-    </script>
 </body>
 </html>
