@@ -5,296 +5,273 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Suivi des Repas</title>
     <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #f4f4f9;
+            --text-color: #333;
+            --header-bg: #2E7D32;
+            --row-even: #f9f9f9;
+            --row-hover: #f0f0f0;
+        }
+        
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
+            padding: 0;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
             padding: 20px;
-            background-color: #f4f4f9;
         }
-        h1 {
-            color: #333;
+        
+        header {
+            background-color: var(--header-bg);
+            color: white;
+            padding: 20px 0;
             text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
+        
+        header h1 {
+            margin: 0;
+            font-size: 2em;
+        }
+        
+        header p {
+            margin: 5px 0 0;
+            opacity: 0.9;
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
         table {
             width: 100%;
             border-collapse: collapse;
-            margin: 20px 0;
-            background: white;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
+        
         th {
-            background-color: #4CAF50;
+            background-color: var(--primary-color);
             color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
         }
+        
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        tr:nth-child(even) {
+            background-color: var(--row-even);
+        }
+        
         tr:hover {
-            background-color: #f5f5f5;
+            background-color: var(--row-hover);
         }
+        
         .total-row {
+            background-color: #e8f5e9 !important;
             font-weight: bold;
-            background-color: #e7e7e7 !important;
         }
-        .form-container {
-            background: white;
+        
+        .total-row td {
+            border-top: 2px solid var(--primary-color);
+        }
+        
+        .date-group {
+            margin-bottom: 30px;
+        }
+        
+        .date-group h2 {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 15px;
+            margin: 0;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .loading {
+            text-align: center;
             padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
+            font-style: italic;
+            color: #666;
         }
-        .form-container input,
-        .form-container select {
-            padding: 8px;
-            margin: 5px 0;
-            width: 100%;
-            box-sizing: border-box;
+        
+        .error {
+            text-align: center;
+            padding: 20px;
+            color: #d32f2f;
+            background-color: #ffebee;
+            border-radius: 8px;
         }
-        .form-container button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .form-container button:hover {
-            background-color: #45a049;
-        }
-        .download-btn {
-            background-color: #2196F3;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        .download-btn:hover {
-            background-color: #0b7dda;
+        
+        @media (max-width: 768px) {
+            th, td {
+                padding: 8px 10px;
+                font-size: 0.9em;
+            }
+            
+            .container {
+                padding: 10px;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>🍽️ Suivi des Repas</h1>
+    <header>
+        <div class="container">
+            <h1>🍽️ Suivi des Repas</h1>
+            <p>Ton journal alimentaire personnel</p>
+        </div>
+    </header>
     
-    <div class="form-container">
-        <h2>Ajouter un repas</h2>
-        <form id="mealForm">
-            <label for="date">Date:</label>
-            <input type="date" id="date" required>
-
-            <label for="mealType">Type de repas:</label>
-            <select id="mealType" required>
-                <option value="Midi">Midi</option>
-                <option value="16h">16h</option>
-                <option value="20h">20h</option>
-            </select>
-
-            <label for="food">Aliments:</label>
-            <input type="text" id="food" placeholder="Ex: Poulet + quinoa + brocolis" required>
-
-            <label for="calories">Calories (kcal):</label>
-            <input type="number" id="calories" required>
-
-            <label for="proteins">Protéines (g):</label>
-            <input type="number" id="proteins" required>
-
-            <label for="carbs">Glucides (g):</label>
-            <input type="number" id="carbs" required>
-
-            <label for="fats">Lipides (g):</label>
-            <input type="number" id="fats" required>
-
-            <label for="notes">Notes:</label>
-            <input type="text" id="notes" placeholder="Ex: Collation légère">
-
-            <button type="submit">Ajouter</button>
-        </form>
-        <button id="downloadBtn" class="download-btn">Télécharger le CSV</button>
+    <div class="container">
+        <div class="table-container">
+            <div id="loading" class="loading">Chargement des données...</div>
+            <div id="error" class="error" style="display: none;"></div>
+            <div id="mealData"></div>
+        </div>
     </div>
 
-    <h2>Liste des repas</h2>
-    <table id="mealTable">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Type de Repas</th>
-                <th>Aliments</th>
-                <th>Calories (kcal)</th>
-                <th>Protéines (g)</th>
-                <th>Glucides (g)</th>
-                <th>Lipides (g)</th>
-                <th>Notes</th>
-            </tr>
-        </thead>
-        <tbody id="mealTableBody">
-            <!-- Les repas seront ajoutés ici dynamiquement -->
-        </tbody>
-        <tfoot>
-            <tr class="total-row">
-                <td colspan="3">Total journalier</td>
-                <td id="totalCalories">0</td>
-                <td id="totalProteins">0</td>
-                <td id="totalCarbs">0</td>
-                <td id="totalFats">0</td>
-                <td></td>
-            </tr>
-        </tfoot>
-    </table>
-
     <script>
-        // Variable globale pour stocker les repas
-        let meals = [];
-
-        // Charger les données depuis le fichier CSV
-        async function loadMeals() {
+        // Charger et afficher les données
+        async function loadAndDisplayMeals() {
+            const loadingDiv = document.getElementById('loading');
+            const errorDiv = document.getElementById('error');
+            const mealDataDiv = document.getElementById('mealData');
+            
             try {
+                loadingDiv.style.display = 'block';
+                errorDiv.style.display = 'none';
+                mealDataDiv.innerHTML = '';
+                
                 const response = await fetch('repas_tracking.csv');
                 if (!response.ok) {
-                    throw new Error('Fichier CSV introuvable');
+                    throw new Error('Fichier CSV introuvable. Vérifie que repas_tracking.csv existe dans le même dossier.');
                 }
+                
                 const csvData = await response.text();
-                parseCSV(csvData);
+                displayMeals(csvData);
+                
             } catch (error) {
-                console.error("Erreur lors du chargement du CSV:", error);
+                loadingDiv.style.display = 'none';
+                errorDiv.style.display = 'block';
+                errorDiv.textContent = `Erreur : ${error.message}`;
+                console.error("Erreur:", error);
             }
         }
-
-        // Analyser le CSV et afficher les données
-        function parseCSV(csvData) {
+        
+        // Afficher les repas groupés par date
+        function displayMeals(csvData) {
+            const loadingDiv = document.getElementById('loading');
+            const mealDataDiv = document.getElementById('mealData');
+            
             const rows = csvData.split('\n').filter(row => row.trim() !== '');
-            const tableBody = document.getElementById('mealTableBody');
-            tableBody.innerHTML = '';
-            meals = []; // Réinitialiser les repas
-
-            let totalCalories = 0;
-            let totalProteins = 0;
-            let totalCarbs = 0;
-            let totalFats = 0;
-
+            if (rows.length <= 1) {
+                loadingDiv.style.display = 'none';
+                mealDataDiv.innerHTML = '<div class="error">Aucun repas trouvé dans le fichier CSV.</div>';
+                return;
+            }
+            
+            // Organiser les repas par date
+            const mealsByDate = {};
             for (let i = 1; i < rows.length; i++) {
                 const columns = rows[i].split(',').map(col => col.trim());
                 if (columns.length >= 8) {
                     const [date, mealType, food, calories, proteins, carbs, fats, notes] = columns;
-                    
-                    const meal = {
-                        date,
-                        mealType,
-                        food,
-                        calories: parseInt(calories) || 0,
-                        proteins: parseInt(proteins) || 0,
-                        carbs: parseInt(carbs) || 0,
-                        fats: parseInt(fats) || 0,
-                        notes
-                    };
-                    meals.push(meal);
-
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${date}</td>
-                        <td>${mealType}</td>
-                        <td>${food}</td>
-                        <td>${calories}</td>
-                        <td>${proteins}</td>
-                        <td>${carbs}</td>
-                        <td>${fats}</td>
-                        <td>${notes}</td>
-                    `;
-                    tableBody.appendChild(row);
-
-                    // Mettre à jour les totaux
-                    totalCalories += meal.calories;
-                    totalProteins += meal.proteins;
-                    totalCarbs += meal.carbs;
-                    totalFats += meal.fats;
+                    if (!mealsByDate[date]) {
+                        mealsByDate[date] = [];
+                    }
+                    mealsByDate[date].push({ mealType, food, calories, proteins, carbs, fats, notes });
                 }
             }
-
-            // Afficher les totaux
-            document.getElementById('totalCalories').textContent = totalCalories;
-            document.getElementById('totalProteins').textContent = totalProteins;
-            document.getElementById('totalCarbs').textContent = totalCarbs;
-            document.getElementById('totalFats').textContent = totalFats;
+            
+            // Générer le HTML
+            let html = '';
+            for (const [date, meals] of Object.entries(mealsByDate)) {
+                html += `
+                    <div class="date-group">
+                        <h2>📅 ${formatDate(date)}</h2>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Aliments</th>
+                                    <th>Calories</th>
+                                    <th>Protéines</th>
+                                    <th>Glucides</th>
+                                    <th>Lipides</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+                
+                let totalCalories = 0;
+                let totalProteins = 0;
+                let totalCarbs = 0;
+                let totalFats = 0;
+                
+                meals.forEach(meal => {
+                    totalCalories += parseInt(meal.calories) || 0;
+                    totalProteins += parseInt(meal.proteins) || 0;
+                    totalCarbs += parseInt(meal.carbs) || 0;
+                    totalFats += parseInt(meal.fats) || 0;
+                    
+                    html += `
+                        <tr>
+                            <td>${meal.mealType}</td>
+                            <td>${meal.food}</td>
+                            <td>${meal.calories}</td>
+                            <td>${meal.proteins}</td>
+                            <td>${meal.carbs}</td>
+                            <td>${meal.fats}</td>
+                            <td>${meal.notes}</td>
+                        </tr>
+                    `;
+                });
+                
+                html += `
+                            </tbody>
+                            <tfoot>
+                                <tr class="total-row">
+                                    <td colspan="2">Total pour le ${formatDate(date)}</td>
+                                    <td>${totalCalories}</td>
+                                    <td>${totalProteins}</td>
+                                    <td>${totalCarbs}</td>
+                                    <td>${totalFats}</td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                `;
+            }
+            
+            mealDataDiv.innerHTML = html;
+            loadingDiv.style.display = 'none';
         }
-
-        // Ajouter un repas au tableau et à la liste globale
-        document.getElementById('mealForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const date = document.getElementById('date').value;
-            const mealType = document.getElementById('mealType').value;
-            const food = document.getElementById('food').value;
-            const calories = parseInt(document.getElementById('calories').value) || 0;
-            const proteins = parseInt(document.getElementById('proteins').value) || 0;
-            const carbs = parseInt(document.getElementById('carbs').value) || 0;
-            const fats = parseInt(document.getElementById('fats').value) || 0;
-            const notes = document.getElementById('notes').value;
-
-            const meal = {
-                date,
-                mealType,
-                food,
-                calories,
-                proteins,
-                carbs,
-                fats,
-                notes
-            };
-            meals.push(meal);
-
-            // Ajouter au tableau
-            const tableBody = document.getElementById('mealTableBody');
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${date}</td>
-                <td>${mealType}</td>
-                <td>${food}</td>
-                <td>${calories}</td>
-                <td>${proteins}</td>
-                <td>${carbs}</td>
-                <td>${fats}</td>
-                <td>${notes}</td>
-            `;
-            tableBody.appendChild(row);
-
-            // Mettre à jour les totaux
-            const totalCalories = meals.reduce((sum, meal) => sum + meal.calories, 0);
-            const totalProteins = meals.reduce((sum, meal) => sum + meal.proteins, 0);
-            const totalCarbs = meals.reduce((sum, meal) => sum + meal.carbs, 0);
-            const totalFats = meals.reduce((sum, meal) => sum + meal.fats, 0);
-
-            document.getElementById('totalCalories').textContent = totalCalories;
-            document.getElementById('totalProteins').textContent = totalProteins;
-            document.getElementById('totalCarbs').textContent = totalCarbs;
-            document.getElementById('totalFats').textContent = totalFats;
-
-            // Réinitialiser le formulaire
-            document.getElementById('mealForm').reset();
-        });
-
-        // Télécharger le CSV
-        document.getElementById('downloadBtn').addEventListener('click', function() {
-            let csvContent = "Date,Type de Repas,Aliments,Calories (kcal),Protéines (g),Glucides (g),Lipides (g),Notes\n";
-            meals.forEach(meal => {
-                csvContent += `${meal.date},${meal.mealType},${meal.food},${meal.calories},${meal.proteins},${meal.carbs},${meal.fats},${meal.notes}\n`;
-            });
-
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.setAttribute('href', url);
-            link.setAttribute('download', 'repas_tracking.csv');
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        });
-
+        
+        // Formater la date (YYYY-MM-DD -> JJ/MM/YYYY)
+        function formatDate(dateStr) {
+            const [year, month, day] = dateStr.split('-');
+            return `${day}/${month}/${year}`;
+        }
+        
         // Charger les données au démarrage
-        loadMeals();
+        loadAndDisplayMeals();
     </script>
 </body>
 </html>
